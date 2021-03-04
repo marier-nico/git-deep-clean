@@ -130,6 +130,10 @@ if [ "$user_input_required" -eq "0" ]; then
     fi
 fi
 
-mkdir -p "$install_location"
-curl -o "$install_location/git-deep-clean.sh" --silent "https://raw.githubusercontent.com/$git_repo/$install_version/git-deep-clean.sh"
-git config --global "alias.$current_alias" '!git-deep-clean.sh'
+temp_file=$(mktemp)
+if curl -o "$temp_file" --silent "https://raw.githubusercontent.com/$git_repo/$install_version/git-deep-clean.sh"; then
+    mkdir -p "$install_location"
+    mv "$temp_file" "$install_location/git-deep-clean.sh"
+    chmod +x "$install_location/git-deep-clean.sh"
+    git config --global "alias.$current_alias" '!git-deep-clean.sh'
+fi
