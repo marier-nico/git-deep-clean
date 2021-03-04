@@ -141,5 +141,5 @@ if curl -o "$temp_file" --silent "https://raw.githubusercontent.com/$git_repo/$i
     mkdir -p "$install_location"
     mv "$temp_file" "$script_path"
     chmod +x "$script_path"
-    git config --global "alias.$current_alias" "\!$script_path"
+    git config --global "alias.$current_alias" "!$script_path"
 fi
