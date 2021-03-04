@@ -78,18 +78,21 @@ run_clean() {
         exit $t_ret
     fi
 
-    pruned_branches=$(echo "$t_std" | grep -Po '(?<=\* \[pruned\] ).+')
-    verbose_git_branches=$(git branch -vv)
+    pruned_branches=$(grep -Po '(?<=\* \[pruned\] ).+' <<< "$t_std" | tr "[:space:]" " ")
 
     if [ ! -z "$pruned_branches" ]; then
-        for pruned_branch in "$pruned_branches"; do
-            branch_to_delete=$(echo "$verbose_git_branches" | grep "$pruned_branch" | awk '{$1=$1};1' | cut -d ' ' -f 1)
+        IFS=' ' read -r -a pruned_branches <<< "$pruned_branches"
+
+        for pruned_branch in "${pruned_branches[@]}"; do
+            branch_to_delete=$(git branch -vv | grep -P "\[$pruned_branch[:\]]" | awk '{$1=$1};1' | cut -d ' ' -f 1)
             info "Running ${PURPLE}git branch -d $branch_to_delete${NC}"
-            delete_output=$(git branch -d "$branch_to_delete")
+
+            delete_output=$(git branch -d "$branch_to_delete" 2>&1)
             if [ ! "$?" -eq "0" ]; then
-                error "Running ${PURPLE}git branch -d $branch_to_delete${NC}"
+                error "Running ${PURPLE}git branch -d $branch_to_delete${NC}: $delete_output"
             fi
         done
+
     else
         info "No branches to prune were found"
     fi

@@ -21,8 +21,7 @@ info() {
 
 yes_no_question() {
     printf "${ORANGE}question${NC} $1 [y/N]: "
-    old_stty=$(stty -g)
-    stty raw -echo; answer=$(head -c 1); stty $old_stty
+    read -n1 answer
     printf "\n"
     if echo "$answer" | grep -iq "^y"; then
         return 0
