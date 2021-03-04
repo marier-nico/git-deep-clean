@@ -21,6 +21,14 @@ get_latest_tag() {
     curl --silent "https://api.github.com/repos/$1/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")'
 }
 
+semver_le() {
+    [ "$1" = "$(echo -e "$1\n$2" | sort -V | head -n1)" ]
+}
+
+semver_lt() {
+    [ "$1" = "$2" ] && return 1 || semver_le $1 $2
+}
+
 info() {
     printf "${BLUE}info${NC} $1\n"
 }
@@ -32,8 +40,20 @@ error() {
 
 # region Auto Update
 run_update() {
-    latest_tag=$(get_latest_tag $1)
-    info "Latest tag: $latest_tag"
+    info "Downloading install script for release ${PURPLE}$latest_tag${NC}"
+
+    export ALIAS_NAME="$alias_name"
+    export INSTALL_LOCATION="$install_location"
+    export GIT_REPO="$git_repo"
+    curl --silent "https://raw.githubusercontent.com/$git_repo/$1/install.sh" | bash
+    unset ALIAS_NAME INSTALL_LOCATION GIT_REPO
+}
+
+run_update_if_needed() {
+    latest_tag=$(get_latest_tag "$git_repo")
+    if semver_lt "$installed_version" "$latest_tag"; then
+        run_update "$latest_tag"
+    fi
 }
 # endregion
 
@@ -77,7 +97,7 @@ run_clean() {
 
 
 if [[ "$@" == *"--update"* ]]; then
-    BLUE="" NC="" PURPLE="" RED="" run_update "$git_repo"
+    BLUE="" NC="" PURPLE="" RED="" run_update_if_needed
 else
     run_clean
     nohup bash -c "$0 --update" > /dev/null 2>&1 &
