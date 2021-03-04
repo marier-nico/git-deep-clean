@@ -84,6 +84,7 @@ run_clean() {
         IFS=' ' read -r -a pruned_branches <<< "$pruned_branches"
 
         for pruned_branch in "${pruned_branches[@]}"; do
+            info "Pruned the branch ${PURPLE}$pruned_branch${NC}"
             branch_to_delete=$(git branch -vv | grep -P "\[$pruned_branch[:\]]" | awk '{$1=$1};1' | cut -d ' ' -f 1)
             info "Running ${PURPLE}git branch -d $branch_to_delete${NC}"
 
