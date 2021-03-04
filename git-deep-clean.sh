@@ -86,11 +86,15 @@ run_clean() {
         for pruned_branch in "${pruned_branches[@]}"; do
             info "Pruned the branch ${PURPLE}$pruned_branch${NC}"
             branch_to_delete=$(git branch -vv | grep -P "\[$pruned_branch[:\]]" | awk '{$1=$1};1' | cut -d ' ' -f 1)
-            info "Running ${PURPLE}git branch -d $branch_to_delete${NC}"
 
-            delete_output=$(git branch -d "$branch_to_delete" 2>&1)
-            if [ ! "$?" -eq "0" ]; then
-                error "Running ${PURPLE}git branch -d $branch_to_delete${NC}: $delete_output"
+            if [ -z "$branch_to_delete" ]; then
+                info "No local branch is tracking ${PURPLE}$pruned_branch${NC}, so none will be deleted"
+            else
+                info "Running ${PURPLE}git branch -d $branch_to_delete${NC}"
+                delete_output=$(git branch -d "$branch_to_delete" 2>&1)
+                if [ ! "$?" -eq "0" ]; then
+                    error "Running ${PURPLE}git branch -d $branch_to_delete${NC}: $delete_output"
+                fi
             fi
         done
 
