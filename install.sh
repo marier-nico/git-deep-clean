@@ -101,7 +101,7 @@ if [ -z "$install_location" ]; then
     current_location="$HOME/.local/bin"
 
     while true; do
-        current_location=$(question "Choose a folder inside your \$PATH to install" "$current_location")
+        current_location=$(question "Choose a folder where you want the script installed" "$current_location")
         if ls "$current_location/git-deep-clean.sh" >/dev/null 2>&1; then
             if ! yes_no_question "A file named ${ORANGE}git-deep-clean.sh${NC} already exists at that location, overwrite?"; then
                 continue
@@ -132,8 +132,14 @@ fi
 
 temp_file=$(mktemp)
 if curl -o "$temp_file" --silent "https://raw.githubusercontent.com/$git_repo/$install_version/git-deep-clean.sh"; then
+    sed -i "s/^alias_name=\".*\"$/alias_name=\"$alias_name\"/" "$temp_file"
+    sed -i "s|^install_location=\".*\"$|install_location=\"$install_location\"|" "$temp_file"
+    sed -i "s/^installed_version=\".*\"$/installed_version=\"$install_version\"/" "$temp_file"
+    sed -i "s|^git_repo=\".*\"$|git_repo=\"$git_repo\"|" "$temp_file"
+
+    script_path="$install_location/git-deep-clean.sh"
     mkdir -p "$install_location"
-    mv "$temp_file" "$install_location/git-deep-clean.sh"
-    chmod +x "$install_location/git-deep-clean.sh"
-    git config --global "alias.$current_alias" '!git-deep-clean.sh'
+    mv "$temp_file" "$script_path"
+    chmod +x "$script_path"
+    git config --global "alias.$current_alias" "\!$script_location"
 fi
