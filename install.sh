@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # region Color Codes
 BLUE=${BLUE-'\033[0;34m'}

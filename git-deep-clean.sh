@@ -46,7 +46,7 @@ run_update() {
     export INSTALL_LOCATION="$install_location"
     export GIT_REPO="$git_repo"
     export INSTALL_VERSION="$1"
-    curl --silent "https://raw.githubusercontent.com/$git_repo/$1/install.sh" | sh
+    curl --silent "https://raw.githubusercontent.com/$git_repo/$1/install.sh" | bash
     unset ALIAS_NAME INSTALL_LOCATION GIT_REPO INSTALL_VERSION
 }
 

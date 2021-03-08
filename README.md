@@ -24,8 +24,8 @@ $ git dc upstream
 # Installation
 
 Installing the script is super simple, just run the command below!
-```
-$ curl -O --silent https://raw.githubusercontent.com/marier-nico/git-deep-clean/main/install.sh && sh install.sh
+```bash
+temp=$(mktemp); curl -o "$temp" --silent https://raw.githubusercontent.com/marier-nico/git-deep-clean/main/install.sh && bash "$temp"
 ```
 
 The install script will prompt you to ask where you would like to install the script and what the
